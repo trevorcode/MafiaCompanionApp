@@ -12,7 +12,7 @@ namespace MafiaApp.Client.State
         private NavigationManager navMan;
 
         public List<string> Test { get; set; }
-        private string RoomId { get; set; }
+        public string RoomId { get; private set; }
 
         public GameConnection(NavigationManager _navMan)
         {
@@ -26,42 +26,44 @@ namespace MafiaApp.Client.State
             SetupEvents();
         }
 
-        public async Task Connect(string roomId, string playerName)
+        public async Task Reset()
+        {
+            RoomId = "";
+            await hubConnection.StopAsync();
+        }
+
+        public async Task<bool> Connect(string roomId, string playerName)
         {
             if (hubConnection.State == HubConnectionState.Disconnected)
             {
                 await hubConnection.StartAsync();
             }
 
-            await hubConnection.SendAsync("JoinRoom", roomId, playerName);
+            var result = await hubConnection.InvokeAsync<string>("JoinRoom", roomId, playerName);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                RoomId = result;
+                navMan.NavigateTo("/play");
+                return true;
+            }
+            else
+            {
+                await hubConnection.StopAsync();
+                return false;
+            }
 
 
         }
 
         private void SetupEvents()
         {
-            hubConnection.On("IncorrectRoomError", () =>
-            {
-                Console.WriteLine("Here3");
-                Test.Add("Error: No room with that code");
-                //hubConnection.StopAsync();
-            });
-
-            hubConnection.On<string>("RoomJoined", (roomId) =>
-            {
-                RoomId = roomId;
-            });
+            //hubConnection.On("IncorrectRoomError", () =>
+            //{
+                
+            //    //hubConnection.StopAsync();
+            //});
         }
 
-        public bool IsConnectedWithRoomId()
-        {
-            if (!string.IsNullOrEmpty(RoomId) && hubConnection.State == HubConnectionState.Connected)
-            {
-                Console.WriteLine("Here4");
-                navMan.NavigateTo("play");
-                return true;
-            }
-            return false;
-        }
     }
 }

@@ -1,35 +1,35 @@
 ﻿@page "/"
 @inject GameConnection connection
 
-    <div class="container text-center">
-        <h1>Mafia Game!</h1>
+<div class="container text-center">
+    <h1>Mafia Game!</h1>
 
-        <div>
-            <label class="d-block">Enter Player Name</label>
-            <input type="text" @bind="PlayerName" placeholder="Enter Player" />
-        </div>
-        <div>
-            <label class="d-block">Enter Room Code</label>
-            <input type="text" @bind="Code" placeholder="Enter Room Code" />
-        </div>
-        <div class="my-2">
-            <button class="btn btn-primary" @onclick="JoinGame">Join</button>
-        </div>
-        <div class="my-2">
-            <a class="btn btn-outline-secondary">Create</a>
-        </div>
-        <div>
-            <p class="text-danger">@Error</p>
-        </div>
-        <div>
-            <ul>
-                @foreach (var s in connection.Test)
-                {
-                    <li>@s</li>
-                }
-            </ul>
-        </div>
+    <div>
+        <label class="d-block">Enter Player Name</label>
+        <input type="text" @bind="PlayerName" placeholder="Enter Player" />
     </div>
+    <div>
+        <label class="d-block">Enter Room Code</label>
+        <input type="text" @bind="Code" placeholder="Enter Room Code" />
+    </div>
+    <div class="my-2">
+        <button class="btn btn-primary" @onclick="JoinGame">Join</button>
+    </div>
+    <div class="my-2">
+        <a class="btn btn-outline-secondary">Create</a>
+    </div>
+    <div>
+        <p class="text-danger">@Error</p>
+    </div>
+    <div>
+        <ul>
+            @foreach (var s in connection.Test)
+            {
+                <li>@s</li>
+            }
+        </ul>
+    </div>
+</div>
 
 @code {
     public string PlayerName { get; set; } = "";
@@ -37,6 +37,11 @@
     public string Code { get; set; } = "";
 
     public string Error { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await connection.Reset();
+    }
 
     private async Task JoinGame()
     {
@@ -53,7 +58,8 @@
         }
 
         await connection.Connect(Code, PlayerName);
-        connection.IsConnectedWithRoomId();
+
+
 
     }
 

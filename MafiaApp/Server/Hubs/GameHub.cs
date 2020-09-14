@@ -16,17 +16,17 @@ namespace MafiaApp.Server.Hubs
             hubState = _hubState;
         }
 
-        public async Task JoinRoom(string roomId, string playerName)
+        public async Task<string> JoinRoom(string roomId, string playerName)
         {
             if (hubState.Rooms.Any(r => r.RoomId == roomId))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
                 hubState.Rooms.FirstOrDefault(r=>r.RoomId == roomId).Players.Add(new Player { ConnectionId = Context.ConnectionId, Name = playerName });
-                await Clients.Caller.SendAsync("RoomJoined", roomId);
+                return roomId;
             }
             else
             {
-                await Clients.Caller.SendAsync("IncorrectRoomError");
+                return "";
             }
         }
 
