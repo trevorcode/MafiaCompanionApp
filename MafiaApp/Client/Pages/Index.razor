@@ -1,8 +1,13 @@
 ﻿@page "/"
+@inject GameConnection connection
 
     <div class="container text-center">
         <h1>Mafia Game!</h1>
 
+        <div>
+            <label class="d-block">Enter Player Name</label>
+            <input type="text" @bind="PlayerName" placeholder="Enter Player" />
+        </div>
         <div>
             <label class="d-block">Enter Room Code</label>
             <input type="text" @bind="Code" placeholder="Enter Room Code" />
@@ -16,13 +21,24 @@
         <div>
             <p class="text-danger">@Error</p>
         </div>
+        <div>
+            <ul>
+                @foreach (var s in connection.Test)
+                {
+                    <li>@s</li>
+                }
+            </ul>
+        </div>
     </div>
 
 @code {
+    public string PlayerName { get; set; } = "";
+
     public string Code { get; set; } = "";
+
     public string Error { get; set; } = "";
 
-    private void JoinGame()
+    private async Task JoinGame()
     {
         if (string.IsNullOrEmpty(Code))
         {
@@ -30,7 +46,15 @@
             return;
         }
 
-        
+        if (string.IsNullOrEmpty(PlayerName))
+        {
+            Error = "Enter player name";
+            return;
+        }
+
+        await connection.Connect(Code, PlayerName);
+        connection.IsConnectedWithRoomId();
+
     }
 
 

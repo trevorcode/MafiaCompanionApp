@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using MafiaApp.Server.Hubs;
+using MafiaApp.Server.State;
 
 namespace MafiaApp.Server
 {
@@ -32,6 +33,9 @@ namespace MafiaApp.Server
             });
 
             services.AddRazorPages();
+
+
+            services.AddSingleton<HubState>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
