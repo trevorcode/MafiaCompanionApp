@@ -1,0 +1,37 @@
+﻿@page "/"
+
+    <div class="container text-center">
+        <h1>Mafia Game!</h1>
+
+        <div>
+            <label class="d-block">Enter Room Code</label>
+            <input type="text" @bind="Code" placeholder="Enter Room Code" />
+        </div>
+        <div class="my-2">
+            <button class="btn btn-primary" @onclick="JoinGame">Join</button>
+        </div>
+        <div class="my-2">
+            <a class="btn btn-outline-secondary">Create</a>
+        </div>
+        <div>
+            <p class="text-danger">@Error</p>
+        </div>
+    </div>
+
+@code {
+    public string Code { get; set; } = "";
+    public string Error { get; set; } = "";
+
+    private void JoinGame()
+    {
+        if (string.IsNullOrEmpty(Code))
+        {
+            Error = "Enter a room code";
+            return;
+        }
+
+        
+    }
+
+
+}
