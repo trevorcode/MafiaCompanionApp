@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MafiaApp.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,19 +19,5 @@ namespace MafiaApp.Server.State
         
     }
 
-    public class Room
-    {
-        public Room()
-        {
-            Players = new List<Player>();
-        }
-        public string RoomId { get; set; }
-        public List<Player> Players { get; set; }
-    }
 
-    public class Player
-    {
-        public string ConnectionId { get; set; }
-        public string Name { get; set; }
-    }
 }

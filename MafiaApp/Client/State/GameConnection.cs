@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using MafiaApp.Shared;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,11 @@ namespace MafiaApp.Client.State
         private NavigationManager navMan;
 
         public List<string> Test { get; set; }
-        public string RoomId { get; private set; }
+        public Room Room { get; private set; }
+
+        public event Action OnChange;
+        private void NotifyStateChanged() => OnChange?.Invoke();
+
 
         public GameConnection(NavigationManager _navMan)
         {
@@ -28,7 +33,7 @@ namespace MafiaApp.Client.State
 
         public async Task Reset()
         {
-            RoomId = "";
+            Room = null;
             await hubConnection.StopAsync();
         }
 
@@ -39,11 +44,11 @@ namespace MafiaApp.Client.State
                 await hubConnection.StartAsync();
             }
 
-            var result = await hubConnection.InvokeAsync<string>("JoinRoom", roomId, playerName);
+            var result = await hubConnection.InvokeAsync<Room>("JoinRoom", roomId, playerName);
 
-            if (!string.IsNullOrEmpty(result))
+            if (!(result is null))
             {
-                RoomId = result;
+                Room = result;
                 navMan.NavigateTo("/play");
                 return true;
             }
@@ -58,11 +63,11 @@ namespace MafiaApp.Client.State
 
         private void SetupEvents()
         {
-            //hubConnection.On("IncorrectRoomError", () =>
-            //{
-                
-            //    //hubConnection.StopAsync();
-            //});
+            hubConnection.On<Room>("UpdateRoomState", (room) =>
+            {
+                Room = room;
+                NotifyStateChanged();
+            });
         }
 
     }

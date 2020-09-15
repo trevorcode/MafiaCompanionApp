@@ -1,4 +1,5 @@
 ﻿using MafiaApp.Server.State;
+using MafiaApp.Shared;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -16,17 +17,29 @@ namespace MafiaApp.Server.Hubs
             hubState = _hubState;
         }
 
-        public async Task<string> JoinRoom(string roomId, string playerName)
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            var room = hubState.Rooms.FirstOrDefault(m => m.Players.Any(p => p.ConnectionId == Context.ConnectionId));
+            room.Players.Remove(room.Players.FirstOrDefault(m => m.ConnectionId == Context.ConnectionId));
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.RoomId);
+
+            await Clients.Group(room.RoomId).SendAsync("UpdateRoomState", room);
+        }
+
+        public async Task<Room> JoinRoom(string roomId, string playerName)
         {
             if (hubState.Rooms.Any(r => r.RoomId == roomId))
             {
+                var room = hubState.Rooms.FirstOrDefault(r => r.RoomId == roomId);
+                room.Players.Add(new Player { ConnectionId = Context.ConnectionId, Name = playerName });
+                await Clients.Group(room.RoomId).SendAsync("UpdateRoomState", room);
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-                hubState.Rooms.FirstOrDefault(r=>r.RoomId == roomId).Players.Add(new Player { ConnectionId = Context.ConnectionId, Name = playerName });
-                return roomId;
+                return room;
             }
             else
             {
-                return "";
+                return null;
             }
         }
 

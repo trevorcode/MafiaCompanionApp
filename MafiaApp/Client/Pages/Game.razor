@@ -1,9 +1,34 @@
 ﻿@page "/play"
 @inject GameConnection connection
+@inject NavigationManager navMan
+@implements IDisposable
 
 <h1>Hello, world!</h1>
 
-<h2>Room Id @connection.RoomId</h2>
+<h2>Room Id @connection.Room.RoomId</h2>
+
+<ul>
+    @foreach (var p in connection.Room.Players)
+    {
+        <li>
+            @p.Name
+        </li>
+    }
+</ul>
 
 @code {
+    protected override void OnInitialized()
+    {
+        connection.OnChange += StateHasChanged;
+
+        if (connection.Room == null)
+        {
+            navMan.NavigateTo("/");
+        }
+    }
+
+    public void Dispose()
+    {
+        connection.OnChange -= StateHasChanged;
+    }
 }
