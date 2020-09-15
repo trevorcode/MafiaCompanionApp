@@ -4,14 +4,14 @@ using System.Text;
 
 namespace MafiaApp.Shared
 {
-    public class Room
+    public class RoomDTO
     {
-        public Room()
+        public RoomDTO()
         {
-            Players = new List<Player>();
         }
         public string RoomId { get; set; }
         public List<Player> Players { get; set; }
+
     }
 
     public class Player

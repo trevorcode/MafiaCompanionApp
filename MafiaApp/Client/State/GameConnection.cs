@@ -13,7 +13,7 @@ namespace MafiaApp.Client.State
         private NavigationManager navMan;
 
         public List<string> Test { get; set; }
-        public Room Room { get; private set; }
+        public RoomDTO Room { get; private set; }
 
         public event Action OnChange;
         private void NotifyStateChanged() => OnChange?.Invoke();
@@ -44,7 +44,7 @@ namespace MafiaApp.Client.State
                 await hubConnection.StartAsync();
             }
 
-            var result = await hubConnection.InvokeAsync<Room>("JoinRoom", roomId, playerName);
+            var result = await hubConnection.InvokeAsync<RoomDTO>("JoinRoom", roomId, playerName);
 
             if (!(result is null))
             {
@@ -63,8 +63,9 @@ namespace MafiaApp.Client.State
 
         private void SetupEvents()
         {
-            hubConnection.On<Room>("UpdateRoomState", (room) =>
+            hubConnection.On<RoomDTO>("UpdateRoomState", (room) =>
             {
+                Console.WriteLine("Here3");
                 Room = room;
                 NotifyStateChanged();
             });

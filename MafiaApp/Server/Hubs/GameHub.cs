@@ -1,4 +1,5 @@
-﻿using MafiaApp.Server.State;
+﻿using MafiaApp.Server.Models;
+using MafiaApp.Server.State;
 using MafiaApp.Shared;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -19,23 +20,25 @@ namespace MafiaApp.Server.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var room = hubState.Rooms.FirstOrDefault(m => m.Players.Any(p => p.ConnectionId == Context.ConnectionId));
-            room.Players.Remove(room.Players.FirstOrDefault(m => m.ConnectionId == Context.ConnectionId));
+            var room = hubState.GetRoomByConnectionId(Context.ConnectionId);
+            room.RemovePlayerByConnectionId(Context.ConnectionId);
 
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.RoomId);
-
-            await Clients.Group(room.RoomId).SendAsync("UpdateRoomState", room);
+            await room.UpdateRoomStateAsync(Clients);
         }
 
-        public async Task<Room> JoinRoom(string roomId, string playerName)
+        public async Task<RoomDTO> JoinRoom(string roomId, string playerName)
         {
-            if (hubState.Rooms.Any(r => r.RoomId == roomId))
+            if (hubState.GetRoomByRoomId(roomId) != null)
             {
-                var room = hubState.Rooms.FirstOrDefault(r => r.RoomId == roomId);
-                room.Players.Add(new Player { ConnectionId = Context.ConnectionId, Name = playerName });
-                await Clients.Group(room.RoomId).SendAsync("UpdateRoomState", room);
-                await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-                return room;
+                var room = hubState.GetRoomByRoomId(roomId);
+                room.AddPlayer(playerName, Context.ConnectionId);
+
+                //await Clients.Clients(room.GetPlayers().ToList()).SendAsync("UpdateRoomState", room.ToRoomDTO());
+                //await Clients.All.SendAsync("UpdateRoomState", room.ToRoomDTO());
+
+                await room.UpdateRoomStateAsync(Clients);
+
+                return room.ToRoomDTO();
             }
             else
             {
@@ -43,9 +46,12 @@ namespace MafiaApp.Server.Hubs
             }
         }
 
-        public async Task SendMessage(string user, string message)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
-        }
+        //public async Task<RoomDTO> CreateRoom()
+        //{
+        //    hubState.
+        //}
+
+
+
     }
 }
