@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject GameConnection connection
+@inject NavigationManager navMan  
 
 <div class="container text-center">
     <h1>Mafia Game!</h1>
@@ -16,18 +17,10 @@
         <button class="btn btn-primary" @onclick="JoinGame">Join</button>
     </div>
     <div class="my-2">
-        <a class="btn btn-outline-secondary">Create</a>
+        <button class="btn btn-outline-secondary"  @onclick="CreateRoom">Create</button>
     </div>
     <div>
         <p class="text-danger">@Error</p>
-    </div>
-    <div>
-        <ul>
-            @foreach (var s in connection.Test)
-            {
-                <li>@s</li>
-            }
-        </ul>
     </div>
 </div>
 
@@ -57,7 +50,25 @@
             return;
         }
 
-        await connection.Connect(Code, PlayerName);
+        if (await connection.Connect(Code, PlayerName))
+        {
+            navMan.NavigateTo("/play");
+        }
+
+    }
+
+    private async Task CreateRoom()
+    {
+        if (string.IsNullOrEmpty(PlayerName))
+        {
+            Error = "Enter player name";
+            return;
+        }
+
+        if (await connection.CreateRoomAndConnect(PlayerName))
+        {
+            navMan.NavigateTo("/play");
+        }
 
 
 

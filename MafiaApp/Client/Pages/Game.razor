@@ -3,18 +3,17 @@
 @inject NavigationManager navMan
 @implements IDisposable
 
-<h1>Hello, world!</h1>
 
-<h2>Room Id @connection.Room.RoomId</h2>
-
-<ul>
-    @foreach (var p in connection.Room.Players)
+@if (!(connection.Room is null))
+{
+    @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Lobby)
     {
-        <li>
-            @p.Name
-        </li>
+        <LobbyViewComponent></LobbyViewComponent>
     }
-</ul>
+    
+
+}
+
 
 @code {
     protected override void OnInitialized()

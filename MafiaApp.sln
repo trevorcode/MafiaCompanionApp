@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MafiaApp.Server", "MafiaApp\Server\MafiaApp.Server.csproj", "{29E107A9-895C-4E93-8412-E4B93FC836F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MafiaApp.Server", "MafiaApp\Server\MafiaApp.Server.csproj", "{29E107A9-895C-4E93-8412-E4B93FC836F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MafiaApp.Client", "MafiaApp\Client\MafiaApp.Client.csproj", "{61888DCB-EDAE-4130-B14E-57ED07CF8270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MafiaApp.Client", "MafiaApp\Client\MafiaApp.Client.csproj", "{61888DCB-EDAE-4130-B14E-57ED07CF8270}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MafiaApp.Shared", "MafiaApp\Shared\MafiaApp.Shared.csproj", "{DB61D6DA-8B01-4FAF-819D-3526D62C063A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MafiaApp.Shared", "MafiaApp\Shared\MafiaApp.Shared.csproj", "{DB61D6DA-8B01-4FAF-819D-3526D62C063A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

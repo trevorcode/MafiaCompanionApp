@@ -12,17 +12,15 @@ namespace MafiaApp.Client.State
         private HubConnection hubConnection;
         private NavigationManager navMan;
 
-        public List<string> Test { get; set; }
-        public RoomDTO Room { get; private set; }
+        public RoomPayload Room { get; private set; }
 
         public event Action OnChange;
         private void NotifyStateChanged() => OnChange?.Invoke();
 
-
+        
         public GameConnection(NavigationManager _navMan)
         {
             navMan = _navMan;
-            Test = new List<string>();
 
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(navMan.ToAbsoluteUri($"/gameHub"))
@@ -44,12 +42,12 @@ namespace MafiaApp.Client.State
                 await hubConnection.StartAsync();
             }
 
-            var result = await hubConnection.InvokeAsync<RoomDTO>("JoinRoom", roomId, playerName);
+            var result = await hubConnection.InvokeAsync<RoomPayload>("JoinRoom", roomId, playerName);
 
             if (!(result is null))
             {
                 Room = result;
-                navMan.NavigateTo("/play");
+                
                 return true;
             }
             else
@@ -58,17 +56,47 @@ namespace MafiaApp.Client.State
                 return false;
             }
 
+        }
 
+        public async Task<bool> CreateRoomAndConnect(string playerName)
+        {
+            if (hubConnection.State == HubConnectionState.Disconnected)
+            {
+                await hubConnection.StartAsync();
+            }
+
+            var result = await hubConnection.InvokeAsync<RoomPayload>("CreateRoom", playerName);
+
+            if (!(result is null))
+            {
+                Room = result;
+                return true;
+            }
+            else
+            {
+                await hubConnection.StopAsync();
+                return false;
+            }
+
+        }
+
+        public async Task UpdateGameConfig()
+        {
+            await hubConnection.InvokeAsync("UpdateGameConfig", Room.RoomId, Room.GameState.GameConfig);
         }
 
         private void SetupEvents()
         {
-            hubConnection.On<RoomDTO>("UpdateRoomState", (room) =>
+            hubConnection.On<RoomPayload>("UpdateRoomState", (room) =>
             {
-                Console.WriteLine("Here3");
                 Room = room;
                 NotifyStateChanged();
             });
+        }
+
+        public string GetConnectionId()
+        {
+            return hubConnection.ConnectionId;
         }
 
     }

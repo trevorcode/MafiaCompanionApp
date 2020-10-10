@@ -1,4 +1,5 @@
 ﻿using MafiaApp.Server.Hubs;
+using MafiaApp.Server.State;
 using MafiaApp.Shared;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -13,27 +14,29 @@ namespace MafiaApp.Server.Models
     {
         public Room()
         {
-            Players = new List<Player>();
+            RoomUsers = new List<RoomUser>();
+            GameState = new GameState();
         }
         public string RoomId { get; set; }
-        public List<Player> Players { get; set; }
+        public List<RoomUser> RoomUsers { get; set; }
+        public GameState GameState { get; set; }
 
         public IEnumerable<string> GetPlayers()
         {
-            foreach (var p in Players)
+            foreach (var p in RoomUsers)
             {
                 yield return p.ConnectionId;
             }
         }
 
-        public void RemovePlayerByConnectionId(string connectionId)
+        public void RemoveRoomUserByConnectionId(string connectionId)
         {
-            Players.Remove(Players.FirstOrDefault(m => m.ConnectionId == connectionId));
+            RoomUsers.Remove(RoomUsers.FirstOrDefault(m => m.ConnectionId == connectionId));
         }
 
-        public void AddPlayer(string playerName, string connectionId)
+        public void AddRoomUser(string playerName, string connectionId, bool isHost = false)
         {
-            Players.Add(new Player() { Name = playerName, ConnectionId = connectionId });
+            RoomUsers.Add(new RoomUser() { Name = playerName, ConnectionId = connectionId, IsHost = isHost });
         }
 
         //public async IClientProxy UpdateRoomState(GameHub gameHub)
@@ -41,9 +44,9 @@ namespace MafiaApp.Server.Models
         //    return gameHub.Clients.Users(this.GetPlayers().ToList());
         //}
 
-        public RoomDTO ToRoomDTO()
+        public RoomPayload ToRoomDTO()
         {
-            return new RoomDTO() { Players = this.Players, RoomId = this.RoomId };
+            return new RoomPayload() { RoomUsers = this.RoomUsers, RoomId = this.RoomId, GameState = this.GameState };
         }
 
         public async Task UpdateRoomStateAsync(IHubCallerClients clients)

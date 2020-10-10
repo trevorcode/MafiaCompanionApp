@@ -12,15 +12,13 @@ namespace MafiaApp.Server.State
         public HubState()
         {
             Rooms = new List<Room>();
-            Rooms.Add(new Room { RoomId = "GARF" });
-            Rooms.Add(new Room { RoomId = "CART" });
         }
 
         public List<Room> Rooms { get; set; }
 
         public Room GetRoomByConnectionId(string connectionId)
         {
-            return Rooms.FirstOrDefault(m => m.Players.Any(p=>p.ConnectionId == connectionId));
+            return Rooms.FirstOrDefault(m => m.RoomUsers.Any(p=>p.ConnectionId == connectionId));
         }
 
         public Room GetRoomByRoomId(string roomId)

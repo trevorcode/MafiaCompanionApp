@@ -1,0 +1,71 @@
+﻿@inject GameConnection connection
+
+<div>
+    <h2>Room Id @connection.Room.RoomId</h2>
+</div>
+
+@if (connection.Room.IsHost(connection.GetConnectionId()))
+{
+    <div>
+        <ul>
+            @foreach (var p in connection.Room.RoomUsers)
+            {
+                <li>
+                    @p.Name @if (p.IsHost) { <span>-Host</span>}
+                </li>
+            }
+        </ul>
+    </div>
+
+    @for (int p = 0; p < connection.Room.GameState.GameConfig.Roles.Count; p++)
+    {
+        int local = p;
+        <div>
+            <select value="@((int)connection.Room.GameState.GameConfig.Roles[local])" @onchange="@((e) => OnUpdated(e, local))">
+                <option value="5">Mafia</option>
+                <option value="2">Citizen</option>
+                <option value="4">Angel</option>
+                <option value="3">Detective</option>
+            </select>
+        </div>
+    }
+}
+
+else
+{
+    <div>
+        <ul>
+            @foreach (var p in connection.Room.RoomUsers)
+            {
+                <li>
+                    @p.Name @if (p.IsHost) { <span>-Host</span>}
+                </li>
+            }
+        </ul>
+    </div>
+    @foreach (var p in connection.Room.GameState.GameConfig.Roles)
+    {
+        <div>
+            @p
+        </div>
+    }
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        connection.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        connection.OnChange -= StateHasChanged;
+    }
+
+    public async Task OnUpdated(ChangeEventArgs e, int index)
+    {
+        connection.Room.GameState.GameConfig.Roles[index] = (MafiaApp.Shared.RolesEnum)int.Parse(e.Value.ToString());
+        await connection.UpdateGameConfig();
+    }
+
+} 
