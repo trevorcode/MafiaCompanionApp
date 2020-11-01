@@ -4,15 +4,27 @@
 @implements IDisposable
 
 
-@if (!(connection.Room is null))
-{
-    @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Lobby)
-    {
-        <LobbyViewComponent></LobbyViewComponent>
-    }
-    
+    <div class="container">
+        @if (!(connection.Room is null))
+        {
+            <div class="text-center">
+                <h2>Room Id @connection.Room.RoomId</h2>
+            </div>
 
-}
+            @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Lobby)
+            {
+                <LobbyViewComponent></LobbyViewComponent>
+            }
+            @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Day)
+            {
+                <DayViewComponent></DayViewComponent>
+            }
+            @if (connection.Room.GameState.State != MafiaApp.Shared.GameStates.Lobby && connection.Room.IsHost(connection.GetConnectionId()))
+            {
+                <button @onclick="EndGame" class="btn btn-danger">End Game</button>
+            }
+        }
+    </div>
 
 
 @code {
@@ -29,5 +41,10 @@
     public void Dispose()
     {
         connection.OnChange -= StateHasChanged;
+    }
+
+    private async Task EndGame()
+    {
+        await connection.EndGame();
     }
 }

@@ -1,0 +1,44 @@
+﻿@inject GameConnection connection
+
+
+<h3>Day @connection.Room.GameState.DayCount</h3>
+
+@if (connection.Room.IsHost(connection.GetConnectionId()))
+{
+    <div>
+        <ul>
+            @foreach (var p in connection.Room.GameState.Players)
+            {
+                <li>
+                    @p.RoomUser.Name - @p.Role
+                </li>
+            }
+        </ul>
+    </div>
+    <button class="btn-primary">Go To Voting</button>
+}
+else
+{
+    <div>
+        <ul>
+            @foreach (var p in connection.Room.GameState.Players)
+            {
+                <li>
+                    @p.RoomUser.Name @if (p.Role == MafiaApp.Shared.RolesEnum.Host) { <span> - Host</span>}
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        connection.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        connection.OnChange -= StateHasChanged;
+    }
+} 

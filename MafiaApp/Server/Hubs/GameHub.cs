@@ -28,9 +28,9 @@ namespace MafiaApp.Server.Hubs
 
                 await room.UpdateRoomStateAsync(Clients);
             }
-            
 
-            
+
+
         }
 
         public async Task<RoomPayload> JoinRoom(string roomId, string playerName)
@@ -92,6 +92,53 @@ namespace MafiaApp.Server.Hubs
             }
         }
 
+        public async Task StartNewGame(string roomId)
+        {
+            var room = hubState.GetRoomByRoomId(roomId);
+
+            if (room != null)
+            {
+                room.GameState.State = GameStates.Day;
+                foreach (var ru in room.RoomUsers)
+                {
+                    var p = new Player();
+                    p.RoomUser = ru;
+                    room.GameState.Players.Add(p);
+                }
+
+                room.GameState.Players.FirstOrDefault(p => p.RoomUser.IsHost).Role = RolesEnum.Host;
+
+                var listOfRemainingPlayers = room.GameState.Players.Where(p => p.Role != RolesEnum.Host).ToList();
+
+                foreach (var r in room.GameState.GameConfig.Roles)
+                {
+                    Random random = new Random();
+                    int listCount = listOfRemainingPlayers.Count;
+                    int newRandom = random.Next(0, listCount);
+                    listOfRemainingPlayers[newRandom].Role = r;
+                    listOfRemainingPlayers.RemoveAt(newRandom);
+                }
+
+                await room.UpdateRoomStateAsync(Clients);
+            }
+        }
+
+        public async Task EndGame(string roomId)
+        {
+            var room = hubState.GetRoomByRoomId(roomId);
+
+            if (room != null)
+            {
+                room.GameState = new GameState();
+
+                for(int i = 0; i<room.RoomUsers.Count-1; i++)
+                {
+                    room.GameState.GameConfig.Roles.Add(RolesEnum.Citizen);
+                }
+
+                await room.UpdateRoomStateAsync(Clients);
+            }
+        }
 
     }
 }

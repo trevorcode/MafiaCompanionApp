@@ -85,6 +85,16 @@ namespace MafiaApp.Client.State
             await hubConnection.InvokeAsync("UpdateGameConfig", Room.RoomId, Room.GameState.GameConfig);
         }
 
+        public async Task StartNewGame()
+        {
+            await hubConnection.InvokeAsync("StartNewGame", Room.RoomId);
+        }
+
+        public async Task EndGame()
+        {
+            await hubConnection.InvokeAsync("EndGame", Room.RoomId);
+        }
+
         private void SetupEvents()
         {
             hubConnection.On<RoomPayload>("UpdateRoomState", (room) =>

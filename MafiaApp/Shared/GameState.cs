@@ -11,9 +11,13 @@ namespace MafiaApp.Shared
         {
             State = GameStates.Lobby;
             GameConfig = new GameConfiguration();
+            Players = new List<Player>();
+            DayCount = 1;
         }
 
         public GameStates State { get; set; }
+        public int DayCount { get; set; }
+        public List<Player> Players { get; set; }
 
         public GameConfiguration GameConfig { get; set; }
     }
@@ -27,4 +31,16 @@ namespace MafiaApp.Shared
         Victory,
         Defeat
     }
+
+    public class Player
+    {
+        public Player()
+        {
+            Role = RolesEnum.Spectator;
+        }
+        public RoomUser RoomUser { get; set; }
+        public RolesEnum Role { get; set; }
+        public bool IsAlive { get; set; } = true;
+    }
+
 }

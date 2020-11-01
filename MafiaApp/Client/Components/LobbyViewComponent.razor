@@ -1,11 +1,8 @@
 ﻿@inject GameConnection connection
 
-<div>
-    <h2>Room Id @connection.Room.RoomId</h2>
-</div>
-
 @if (connection.Room.IsHost(connection.GetConnectionId()))
 {
+    <h3>Players</h3>
     <div>
         <ul>
             @foreach (var p in connection.Room.RoomUsers)
@@ -17,6 +14,7 @@
         </ul>
     </div>
 
+    <h3>Roles</h3>
     @for (int p = 0; p < connection.Room.GameState.GameConfig.Roles.Count; p++)
     {
         int local = p;
@@ -29,10 +27,11 @@
             </select>
         </div>
     }
+    <button class="btn btn-primary" @onclick="StartGame">Start Game</button>
 }
-
 else
 {
+    <h3>Players</h3>
     <div>
         <ul>
             @foreach (var p in connection.Room.RoomUsers)
@@ -43,6 +42,7 @@ else
             }
         </ul>
     </div>
+    <h3>Roles</h3>
     @foreach (var p in connection.Room.GameState.GameConfig.Roles)
     {
         <div>
@@ -68,4 +68,8 @@ else
         await connection.UpdateGameConfig();
     }
 
+    public async Task StartGame()
+    {
+        await connection.StartNewGame();
+    }
 } 
