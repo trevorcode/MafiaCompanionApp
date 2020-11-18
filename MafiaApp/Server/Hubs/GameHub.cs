@@ -123,6 +123,39 @@ namespace MafiaApp.Server.Hubs
             }
         }
 
+        public async Task NextGamePeriod(string roomId)
+        {
+            var room = hubState.GetRoomByRoomId(roomId);
+
+            if (room.GameState.State == GameStates.Day)
+            {
+                if (room.GameState.DayCount == 1)
+                {
+                    room.GameState.State = GameStates.Night;
+                }
+                else
+                {
+                    room.GameState.State = GameStates.Voting;
+                }
+            }
+            else if (room.GameState.State == GameStates.Voting)
+            {
+                room.GameState.State = GameStates.Night;
+            }
+            else if (room.GameState.State == GameStates.Night)
+            {
+                room.GameState.DayCount += 1;
+                room.GameState.State = GameStates.Day;
+            }
+
+            room.GameState.Players.ForEach(p =>
+            {
+                p.SelectedPlayer = null;
+            });
+
+            await room.UpdateRoomStateAsync(Clients);
+        }
+
         public async Task EndGame(string roomId)
         {
             var room = hubState.GetRoomByRoomId(roomId);

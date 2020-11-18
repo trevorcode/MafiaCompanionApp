@@ -4,27 +4,46 @@
 @implements IDisposable
 
 
-    <div class="container">
-        @if (!(connection.Room is null))
-        {
-            <div class="text-center">
-                <h2>Room Id @connection.Room.RoomId</h2>
-            </div>
+<div class="container">
+    @if (!(connection.Room is null))
+    {
+        <div class="text-center">
+            <h2>Room Id @connection.Room.RoomId</h2>
+        </div>
 
-            @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Lobby)
-            {
-                <LobbyViewComponent></LobbyViewComponent>
-            }
-            @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Day)
-            {
-                <DayViewComponent></DayViewComponent>
-            }
-            @if (connection.Room.GameState.State != MafiaApp.Shared.GameStates.Lobby && connection.Room.IsHost(connection.GetConnectionId()))
-            {
-                <button @onclick="EndGame" class="btn btn-danger">End Game</button>
-            }
+        @if (connection.Room.GameState.State != MafiaApp.Shared.GameStates.Lobby)
+        {
+            <h2>@connection.GetUserSelf().RoomUser.Name</h2>
+            <details>
+                <summary>Click here to view role</summary>
+                <p>
+                    @connection.Room.GameState.Players.FirstOrDefault(r => r.RoomUser.ConnectionId == connection.GetConnectionId()).Role
+                </p>
+            </details>
         }
-    </div>
+
+        @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Lobby)
+        {
+            <LobbyViewComponent></LobbyViewComponent>
+        }
+        @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Day)
+        {
+            <DayViewComponent></DayViewComponent>
+        }
+        @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Voting)
+        {
+            <VotingViewComponent></VotingViewComponent>
+        }
+        @if (connection.Room.GameState.State == MafiaApp.Shared.GameStates.Night)
+        {
+            <NightViewComponent></NightViewComponent>
+        }
+        @if (connection.Room.GameState.State != MafiaApp.Shared.GameStates.Lobby && connection.Room.IsHost(connection.GetConnectionId()))
+        {
+            <button @onclick="EndGame" class="btn btn-danger">End Game</button>
+        }
+    }
+</div>
 
 
 @code {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MafiaApp.Client.State
@@ -90,6 +91,11 @@ namespace MafiaApp.Client.State
             await hubConnection.InvokeAsync("StartNewGame", Room.RoomId);
         }
 
+        public async Task GoToNextGamePeriod()
+        {
+            await hubConnection.InvokeAsync("NextGamePeriod", Room.RoomId);
+        }
+
         public async Task EndGame()
         {
             await hubConnection.InvokeAsync("EndGame", Room.RoomId);
@@ -109,5 +115,9 @@ namespace MafiaApp.Client.State
             return hubConnection.ConnectionId;
         }
 
+        public Player GetUserSelf()
+        {
+            return this.Room.GameState.Players.FirstOrDefault(r => r.RoomUser.ConnectionId == this.GetConnectionId());
+        }
     }
 }

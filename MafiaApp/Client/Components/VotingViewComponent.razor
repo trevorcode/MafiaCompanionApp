@@ -1,50 +1,50 @@
 ﻿@inject GameConnection connection
 
 
-<h3>Day @connection.Room.GameState.DayCount</h3>
+<h3>Day @connection.Room.GameState.DayCount - Voting</h3>
 
 @if (connection.Room.IsHost(connection.GetConnectionId()))
 {
-<div>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th></th>
-        </tr>
-        @foreach (var p in connection.Room.GameState.Players)
-        {
-
-            @if (p.Role != RolesEnum.Host)
+    <div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+            @foreach (var p in connection.Room.GameState.Players)
             {
-                <tr>
-                    <td>
-                        @p.RoomUser.Name
-                    </td>
-                    <td>
-                        @p.Role
-                    </td>
-                    <td>
-                        @if (connection.GetUserSelf().Role == RolesEnum.Host)
-                        {
-                            if (p.IsAlive)
-                            {
-                                <button class="btn btn-warning">Dead</button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-warning">Make Alive</button>
-                            }
 
-                        }
-                    </td>
-                </tr>
+                @if (p.Role != RolesEnum.Host)
+                {
+                    <tr>
+                        <td>
+                            @p.RoomUser.Name
+                        </td>
+                        <td>
+                            @p.Role
+                        </td>
+                        <td>
+                            @if (connection.GetUserSelf().Role == RolesEnum.Host)
+                            {
+                                if (p.IsAlive)
+                                {
+                                    <button class="btn btn-warning">Dead</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-warning">Make Alive</button>
+                                }
+
+                            }
+                        </td>
+                    </tr>
+                }
+
             }
 
-        }
-
-    </table>
-</div>
+        </table>
+    </div>
     <button class="btn-primary" @onclick="GoToNextGamePeriod">Go To Voting</button>
 }
 else
@@ -83,6 +83,7 @@ else
     </div>
 }
 
+
 @code {
     protected override void OnInitialized()
     {
@@ -97,5 +98,10 @@ else
     public async Task GoToNextGamePeriod()
     {
         await connection.GoToNextGamePeriod();
+    }
+
+    public async Task SelectPlayer(Player player)
+    {
+        //await connection.SelectPlayer(player);
     }
 } 

@@ -41,6 +41,7 @@ namespace MafiaApp.Shared
         public RoomUser RoomUser { get; set; }
         public RolesEnum Role { get; set; }
         public bool IsAlive { get; set; } = true;
+        public Player SelectedPlayer { get; set; }
     }
 
 }
