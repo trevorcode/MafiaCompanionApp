@@ -10,6 +10,7 @@
             <tr>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Votes</th>
                 <th></th>
             </tr>
             @foreach (var p in connection.Room.GameState.Players)
@@ -23,6 +24,9 @@
                         </td>
                         <td>
                             @p.Role
+                        </td>
+                        <td>
+                            @string.Join(", ", connection.Room.GameState.Players.Where(player => (player.SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId).Select(m => m.RoomUser.Name + " " + m.Role).ToList())
                         </td>
                         <td>
                             @if (connection.GetUserSelf().Role == RolesEnum.Host)
@@ -45,7 +49,7 @@
 
         </table>
     </div>
-    <button class="btn-primary" @onclick="GoToNextGamePeriod">Go To Voting</button>
+    <button class="btn btn-primary" @onclick="GoToNextGamePeriod">Go to Night</button>
 }
 else
 {
@@ -54,6 +58,8 @@ else
             <tr>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Votes</th>
+                <th></th>
             </tr>
             @foreach (var p in connection.Room.GameState.Players)
             {
@@ -72,6 +78,23 @@ else
                             @if (p.Role == RolesEnum.Detective && connection.GetUserSelf().Role == RolesEnum.Detective)
                             {
                                 <span> - Detective</span>
+                            }
+                            @if (p.Role == RolesEnum.Angel && connection.GetUserSelf().Role == RolesEnum.Angel)
+                            {
+                                <span> - Detective</span>
+                            }
+                        </td>
+                        <td>
+                            @string.Join(", ", connection.Room.GameState.Players.Where(player => (player.SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId).Select(m => m.RoomUser.Name).ToList())
+                        </td>
+                        <td>
+                            @if ((connection.GetUserSelf().SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId)
+                            {
+                                <button class="btn btn-success" @onclick="@(() => SelectPlayer(null))">Selected</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-primary" @onclick="@(() => SelectPlayer(p))">Select</button>
                             }
                         </td>
                     </tr>
@@ -102,6 +125,6 @@ else
 
     public async Task SelectPlayer(Player player)
     {
-        //await connection.SelectPlayer(player);
+        await connection.SelectPlayer(player);
     }
 } 

@@ -6,44 +6,87 @@
 @if (connection.Room.IsHost(connection.GetConnectionId()))
 {
     <div>
-        <ul>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Votes</th>
+            </tr>
             @foreach (var p in connection.Room.GameState.Players)
             {
-                <li>
-                    @p.RoomUser.Name - @p.Role
-                </li>
+
+                @if (p.Role != RolesEnum.Host)
+                {
+                    <tr>
+                        <td>
+                            @p.RoomUser.Name
+                        </td>
+                        <td>
+                            @p.Role
+                        </td>
+                        <td>
+                            @string.Join(", ", connection.Room.GameState.Players.Where(player => (player.SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId).Select(m => m.RoomUser.Name + " " + m.Role).ToList())
+                        </td>
+                    </tr>
+                }
+
             }
-        </ul>
+
+        </table>
     </div>
-    <button class="btn-primary" @onclick="GoToNextGamePeriod">Go To Voting</button>
+    <button class="btn btn-primary" @onclick="GoToNextGamePeriod">Go to Day</button>
 }
 else
 {
     <div>
-        <ul>
-
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Votes</th>
+                <th></th>
+            </tr>
             @foreach (var p in connection.Room.GameState.Players)
             {
+
                 @if (p.Role != RolesEnum.Host)
                 {
-                    <li>
-
-                        @p.RoomUser.Name
-
-
-                        @if (p.Role == RolesEnum.Mafia && connection.GetUserSelf().Role == RolesEnum.Mafia)
-                        {
-                            <span> - Mafia</span>
-                        }
-                        @if (p.Role == RolesEnum.Detective && connection.GetUserSelf().Role == RolesEnum.Detective)
-                        {
-                            <span> - Detective</span>
-                        }
-                    </li>
+                    <tr>
+                        <td>
+                            @p.RoomUser.Name
+                        </td>
+                        <td>
+                            @if (p.Role == RolesEnum.Mafia && connection.GetUserSelf().Role == RolesEnum.Mafia)
+                            {
+                                <span> - Mafia</span>
+                            }
+                            @if (p.Role == RolesEnum.Detective && connection.GetUserSelf().Role == RolesEnum.Detective)
+                            {
+                                <span> - Detective</span>
+                            }
+                        </td>
+                        <td>
+                            @string.Join(", ", connection.Room.GameState.Players.Where(player => (player.SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId && player.Role == connection.GetUserSelf().Role).Select(m => m.RoomUser.Name + " " + m.Role).ToList())
+                        </td>
+                        <td>
+                            @if (connection.GetUserSelf().Role is RolesEnum.Angel or RolesEnum.Detective or RolesEnum.Mafia)
+                            {
+                                @if ((connection.GetUserSelf().SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId)
+                                {
+                                    <button class="btn btn-success" @onclick="@(() => SelectPlayer(null))">Selected</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary" @onclick="@(() => SelectPlayer(p))">Select</button>
+                                }
+                            }
+                        </td>
+                    </tr>
                 }
+
             }
 
-        </ul>
+        </table>
     </div>
 }
 
@@ -61,5 +104,10 @@ else
     public async Task GoToNextGamePeriod()
     {
         await connection.GoToNextGamePeriod();
+    }
+
+    public async Task SelectPlayer(Player player)
+    {
+        await connection.SelectPlayer(player);
     }
 } 

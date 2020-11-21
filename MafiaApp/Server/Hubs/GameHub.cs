@@ -137,10 +137,20 @@ namespace MafiaApp.Server.Hubs
                 {
                     room.GameState.State = GameStates.Voting;
                 }
+
+                room.GameState.Players.ForEach(p =>
+                {
+                    p.SelectedPlayer = null;
+                });
             }
             else if (room.GameState.State == GameStates.Voting)
             {
                 room.GameState.State = GameStates.Night;
+
+                room.GameState.Players.ForEach(p =>
+                {
+                    p.SelectedPlayer = null;
+                });
             }
             else if (room.GameState.State == GameStates.Night)
             {
@@ -148,10 +158,15 @@ namespace MafiaApp.Server.Hubs
                 room.GameState.State = GameStates.Day;
             }
 
-            room.GameState.Players.ForEach(p =>
-            {
-                p.SelectedPlayer = null;
-            });
+            await room.UpdateRoomStateAsync(Clients);
+        }
+
+        public async Task SelectPlayer(string roomId, Player p)
+        {
+            var room = hubState.GetRoomByRoomId(roomId);
+
+            var player = room.GameState.Players.FirstOrDefault(r => r.RoomUser.ConnectionId == Context.ConnectionId);
+            player.SelectedPlayer = p;
 
             await room.UpdateRoomStateAsync(Clients);
         }

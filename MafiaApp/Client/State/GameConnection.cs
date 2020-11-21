@@ -95,6 +95,10 @@ namespace MafiaApp.Client.State
         {
             await hubConnection.InvokeAsync("NextGamePeriod", Room.RoomId);
         }
+        public async Task SelectPlayer(Player p)
+        {
+            await hubConnection.InvokeAsync("SelectPlayer", Room.RoomId, p);
+        }
 
         public async Task EndGame()
         {
