@@ -6,7 +6,7 @@
 @if (connection.Room.IsHost(connection.GetConnectionId()))
 {
     <div>
-        <table>
+        <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -33,11 +33,11 @@
                             {
                                 if (p.IsAlive)
                                 {
-                                    <button class="btn btn-warning">Dead</button>
+                                    <button class="btn btn-warning" @onclick="@(() => ToggleDead(p))">Dead</button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-warning">Make Alive</button>
+                                    <button class="btn btn-warning" @onclick="@(() => ToggleDead(p))">Make Alive</button>
                                 }
 
                             }
@@ -54,7 +54,7 @@
 else
 {
     <div>
-        <table>
+        <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -78,6 +78,10 @@ else
                             @if (p.Role == RolesEnum.Detective && connection.GetUserSelf().Role == RolesEnum.Detective)
                             {
                                 <span> - Detective</span>
+                            }
+                            @if (!p.IsAlive)
+                            {
+                                <span> (Dead)</span>
                             }
                         </td>
                         <td>
@@ -107,5 +111,10 @@ else
     public async Task GoToNextGamePeriod()
     {
         await connection.GoToNextGamePeriod();
+    }
+
+    private async Task ToggleDead(Player p)
+    {
+        await connection.ToggleDead(p);
     }
 } 

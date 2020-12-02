@@ -100,6 +100,11 @@ namespace MafiaApp.Client.State
             await hubConnection.InvokeAsync("SelectPlayer", Room.RoomId, p);
         }
 
+        public async Task ToggleDead(Player p)
+        {
+            await hubConnection.InvokeAsync("TogglePlayerDeadState", Room.RoomId, p);
+        }
+
         public async Task EndGame()
         {
             await hubConnection.InvokeAsync("EndGame", Room.RoomId);

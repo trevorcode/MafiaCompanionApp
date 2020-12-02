@@ -6,7 +6,7 @@
 @if (connection.Room.IsHost(connection.GetConnectionId()))
 {
     <div>
-        <table>
+        <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -54,7 +54,7 @@
 else
 {
     <div>
-        <table>
+        <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -81,20 +81,27 @@ else
                             }
                             @if (p.Role == RolesEnum.Angel && connection.GetUserSelf().Role == RolesEnum.Angel)
                             {
-                                <span> - Detective</span>
+                                <span> - Angel</span>
+                            }
+                            @if (!p.IsAlive)
+                            {
+                                <span> (Dead)</span>
                             }
                         </td>
                         <td>
                             @string.Join(", ", connection.Room.GameState.Players.Where(player => (player.SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId).Select(m => m.RoomUser.Name).ToList())
                         </td>
                         <td>
-                            @if ((connection.GetUserSelf().SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId)
+                            @if (IsAlive())
                             {
-                                <button class="btn btn-success" @onclick="@(() => SelectPlayer(null))">Selected</button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-primary" @onclick="@(() => SelectPlayer(p))">Select</button>
+                                @if ((connection.GetUserSelf().SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId)
+                                {
+                                    <button class="btn btn-success" @onclick="@(() => SelectPlayer(null))">Selected</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary" @onclick="@(() => SelectPlayer(p))">Select</button>
+                                }
                             }
                         </td>
                     </tr>
@@ -126,5 +133,10 @@ else
     public async Task SelectPlayer(Player player)
     {
         await connection.SelectPlayer(player);
+    }
+
+    private bool IsAlive()
+    {
+        return connection.GetUserSelf().IsAlive;
     }
 } 

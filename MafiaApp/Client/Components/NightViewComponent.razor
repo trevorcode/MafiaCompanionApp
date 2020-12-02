@@ -6,7 +6,7 @@
 @if (connection.Room.IsHost(connection.GetConnectionId()))
 {
     <div>
-        <table>
+        <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -39,7 +39,7 @@
 else
 {
     <div>
-        <table>
+        <table class="table">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -64,12 +64,20 @@ else
                             {
                                 <span> - Detective</span>
                             }
+                            @if (p.Role == RolesEnum.Angel && connection.GetUserSelf().Role == RolesEnum.Angel)
+                            {
+                                <span> - Angel</span>
+                            }
+                            @if (!p.IsAlive)
+                            {
+                                <span> (Dead)</span>
+                            }
                         </td>
                         <td>
                             @string.Join(", ", connection.Room.GameState.Players.Where(player => (player.SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId && player.Role == connection.GetUserSelf().Role).Select(m => m.RoomUser.Name + " " + m.Role).ToList())
                         </td>
                         <td>
-                            @if (connection.GetUserSelf().Role is RolesEnum.Angel or RolesEnum.Detective or RolesEnum.Mafia)
+                            @if (connection.GetUserSelf().Role is RolesEnum.Angel or RolesEnum.Detective or RolesEnum.Mafia && IsAlive())
                             {
                                 @if ((connection.GetUserSelf().SelectedPlayer?.RoomUser.ConnectionId ?? "") == p.RoomUser.ConnectionId)
                                 {
@@ -109,5 +117,10 @@ else
     public async Task SelectPlayer(Player player)
     {
         await connection.SelectPlayer(player);
+    }
+
+    private bool IsAlive()
+    {
+        return connection.GetUserSelf().IsAlive;
     }
 } 

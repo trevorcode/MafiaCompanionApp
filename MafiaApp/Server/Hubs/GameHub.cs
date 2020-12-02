@@ -171,6 +171,16 @@ namespace MafiaApp.Server.Hubs
             await room.UpdateRoomStateAsync(Clients);
         }
 
+        public async Task TogglePlayerDeadState(string roomId, Player p)
+        {
+            var room = hubState.GetRoomByRoomId(roomId);
+
+            var player = room.GameState.Players.FirstOrDefault(r => p.RoomUser.ConnectionId == r.RoomUser.ConnectionId);
+            player.IsAlive = !player.IsAlive;
+
+            await room.UpdateRoomStateAsync(Clients);
+        }
+
         public async Task EndGame(string roomId)
         {
             var room = hubState.GetRoomByRoomId(roomId);
