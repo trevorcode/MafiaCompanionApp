@@ -33,11 +33,11 @@
                             {
                                 if (p.IsAlive)
                                 {
-                                    <button class="btn btn-warning">Dead</button>
+                                    <button class="btn btn-warning" @onclick="@(() => ToggleDead(p))">Dead</button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-warning">Make Alive</button>
+                                    <button class="btn btn-warning" @onclick="@(() => ToggleDead(p))">Make Alive</button>
                                 }
 
                             }
@@ -138,5 +138,10 @@ else
     private bool IsAlive()
     {
         return connection.GetUserSelf().IsAlive;
+    }
+
+    private async Task ToggleDead(Player p)
+    {
+        await connection.ToggleDead(p);
     }
 } 
